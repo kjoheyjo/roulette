@@ -1,10 +1,3 @@
-<!-- 
-	external schema configuration file for binding XML schema to Java classes
-	XML schema definition can be found in src/main/java/resources/xjc.xsd
-	
-	jaxb2-maven-plugin must be added to this maven project by updating pom.xml file.
- -->
-
 <?xml version="1.0" encoding="UTF-8"?>
 <jaxb:bindings
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
