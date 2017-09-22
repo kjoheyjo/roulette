@@ -1,12 +1,14 @@
 package junit.RouletteControllerTest;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -42,21 +44,21 @@ public class RouletteControllerTest {
         ResultMatcher ok = MockMvcResultMatchers.status()
                                                 .isOk();
 
-        MockHttpServletRequestBuilder builder =
-                            MockMvcRequestBuilders.post("/init")
-                                                  .contentType(MEDIA_TYPE_JSON_UTF8).accept(MEDIA_TYPE_JSON_UTF8).content(createUserInXml(
-                                                                      "joe",
-                                                                      "joe@example.com",
-                                                                      "abc"));
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/init").contentType(MEDIA_TYPE_JSON_UTF8).accept(MEDIA_TYPE_JSON_UTF8).
+                            content(createUserInXml( "joe","joe@example.com","abc"));
+        
 
         this.mockMvc.perform(builder)
+        			.andDo(print())
                     .andExpect(MockMvcResultMatchers.status()
                                                     .isOk());
     }
 
     private static String createUserInXml (String name, String email, String password) {
-        return "<Header>" +
-        "<username>" + name + "</username>" +
-        "</Header>";
+        return  "<GameRequest><Header><GameDetails class=\"GBet\" name=\"RouletteV3\" channel=\"I\" free_play=\"No\"/>" + 
+        		"<Customer cookie=\"aTXT3wrn0c/9Ctd7mGZullM1JNTxpL3MTPqMCke/NPQ1cgELzEjQL8o33 1ihsa0CsSR\" is_guest=\"No\" csrf_token=\"SXjTmkWSxrcXUFrsh6EULWpM7ffZhz7yz rynTs5CiKmAj50ev1As92ounJYBso=\"  affiliate=\"\"  />" + 
+        		"</Header><Init definition=\"Yes\" payout=\"Yes\" promotions=\"Yes\" freebets=\"Yes\" config=\"Yes\" />" + 
+        		"<Stats><StatsAttribute name=\"FavouriteBet\" parameter=\"200\"/></Stats>" + 
+        		"</GameRequest>";
     }
 }

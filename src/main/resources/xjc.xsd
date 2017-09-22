@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    jxb:version="1.0">
+	<xs:element name="GameResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Header">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="GameId">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:short" name="id" />
+											<xs:attribute type="xs:byte" name="ver" />
+											<xs:attribute type="xs:string" name="channel" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Customer">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Account">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute type="xs:float" name="balance" />
+														<xs:attribute type="xs:float" name="held_funds" />
+														<xs:attribute type="xs:string" name="ccy_code" />
+														<xs:attribute type="xs:string" name="adjusted_free_balance" />
+														<xs:attribute type="xs:string" name="ccy_decimal_separator" />
+														<xs:attribute type="xs:string" name="ccy_thousand_separator" />
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Init">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BetDef">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:byte" name="min_number" />
+											<xs:attribute type="xs:byte" name="max_number" />
+											<xs:attribute type="xs:byte" name="total_drawn" />
+											<xs:attribute type="xs:string" name="draw_duplicates" />
+											<xs:attribute type="xs:byte" name="num_draw_sets" />
+											<xs:attribute type="xs:string" name="use_la_partage" />
+											<xs:attribute type="xs:byte" name="max_groups" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="BetPayout">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="BetSeln" maxOccurs="unbounded"
+											minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute type="xs:string" name="name"
+															use="optional" />
+														<xs:attribute type="xs:string" name="seln"
+															use="optional" />
+														<xs:attribute type="xs:string" name="la_partage_seln"
+															use="optional" />
+														<xs:attribute type="xs:string" name="type"
+															use="optional" />
+														<xs:attribute type="xs:float" name="payout"
+															use="optional" />
+														<xs:attribute type="xs:string" name="min_stake"
+															use="optional" />
+														<xs:attribute type="xs:float" name="max_stake"
+															use="optional" />
+														<xs:attribute type="xs:string" name="lifetime_type"
+															use="optional" />
+														<xs:attribute type="xs:float" name="payout_incr"
+															use="optional" />
+														<xs:attribute type="xs:string" name="mth_act"
+															use="optional" />
+														<xs:attribute type="xs:byte" name="mth_no"
+															use="optional" />
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute type="xs:byte" name="total" />
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="FreebetSummary">
+								<xs:complexType>
+									<xs:annotation>
+										<xs:appinfo>
+											<jxb:class name="FreeBetSummaryInit">
+											</jxb:class>
+										</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:float" name="available_balance" />
+											<xs:attribute type="xs:byte" name="num_tokens" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="BonusPromotion">
+								<xs:complexType>
+									<xs:annotation>
+										<xs:appinfo>
+											<jxb:class name="BonusPromotionInit">
+											</jxb:class>
+										</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="bonus_name" />
+											<xs:attribute type="xs:string" name="bonus_type" />
+											<xs:attribute type="xs:byte" name="points_earned" />
+											<xs:attribute type="xs:byte" name="award_target" />
+											<xs:attribute type="xs:float" name="earned_pcnt" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="GameConfig">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="GameConfigSection" maxOccurs="unbounded"
+											minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Theme" maxOccurs="unbounded"
+														minOccurs="0">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute type="xs:string" name="name"
+																		use="optional" />
+																	<xs:attribute type="xs:string" name="selected"
+																		use="optional" />
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="FavouriteBet" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="FavouriteBetSeln"
+																	maxOccurs="unbounded" minOccurs="0">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute type="xs:byte" name="seln_id"
+																					use="optional" />
+																				<xs:attribute type="xs:string" name="bet"
+																					use="optional" />
+																				<xs:attribute type="xs:string" name="group_name"
+																					use="optional" />
+																				<xs:attribute type="xs:byte" name="seln"
+																					use="optional" />
+																				<xs:attribute type="xs:float" name="stake"
+																					use="optional" />
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute type="xs:string" name="name" />
+															<xs:attribute type="xs:string" name="creation_date" />
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute type="xs:byte" name="id" use="optional" />
+												<xs:attribute type="xs:string" name="name" use="optional" />
+												<xs:attribute type="xs:string" name="allowed_actions"
+													use="optional" />
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute type="xs:short" name="min_anim_time" />
+						<xs:attribute type="xs:short" name="max_anim_time" />
+						<xs:attribute type="xs:float" name="min_stake" />
+						<xs:attribute type="xs:float" name="max_stake" />
+						<xs:attribute type="xs:float" name="dflt_stake" />
+						<xs:attribute type="xs:float" name="max_winnings" />
+						<xs:attribute type="xs:string" name="stake_incr" />
+						<xs:attribute type="xs:string" name="new" />
+						<xs:attribute type="xs:float" name="stake" />
+						<xs:attribute type="xs:float" name="stake_per_line" />
+						<xs:attribute type="xs:float" name="win" />
+						<xs:attribute type="xs:byte" name="id" />
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Play">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FreebetSummary">
+								<xs:complexType>
+									<xs:annotation>
+										<xs:appinfo>
+											<jxb:class name="FreeBetSummary">
+											</jxb:class>
+										</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:float" name="available_balance" />
+											<xs:attribute type="xs:byte" name="num_tokens" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="BonusPromotion">
+								<xs:complexType>
+									<xs:annotation>
+										<xs:appinfo>
+											<jxb:class name="BonusPromotion">
+											</jxb:class>
+										</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="bonus_name" />
+											<xs:attribute type="xs:string" name="bonus_type" />
+											<xs:attribute type="xs:byte" name="points_earned" />
+											<xs:attribute type="xs:byte" name="award_target" />
+											<xs:attribute type="xs:float" name="earned_pcnt" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="BetState">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Bet" maxOccurs="unbounded"
+											minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute type="xs:string" name="name"
+															use="optional" />
+														<xs:attribute type="xs:float" name="stake"
+															use="optional" />
+														<xs:attribute type="xs:float" name="winnings"
+															use="optional" />
+														<xs:attribute type="xs:string" name="seln"
+															use="optional" />
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute type="xs:byte" name="drawn" />
+									<xs:attribute type="xs:byte" name="total_bets" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute type="xs:float" name="stake" />
+						<xs:attribute type="xs:float" name="win" />
+						<xs:attribute type="xs:short" name="id" />
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Stats">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="StatsAttribute">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="name" />
+											<xs:attribute type="xs:string" name="valueAttribute" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

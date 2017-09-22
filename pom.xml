@@ -74,6 +74,14 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>jaxb2-maven-plugin</artifactId> 
+				<version>1.6</version> <executions> <execution> <id>xjc</id> <goals> <goal>xjc</goal> 
+				</goals> </execution> </executions> <configuration> <arguments>-b ${project.basedir}/src/main/xsd/binding.xml</arguments> 
+				<schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory> 
+				<outputDirectory>${project.basedir}/src/main/java</outputDirectory> <clearOutputDir>false</clearOutputDir> 
+				<properties> <property> <name>javax.xml.accessExternalSchema</name> <value>all</value> 
+				</property> <property> <name>javax.xml.accessExternalDTD</name> <value>all</value> 
+				</property> </properties> </configuration> </plugin> -->
 
 		<!-- MySQL -->
 		<dependency>
