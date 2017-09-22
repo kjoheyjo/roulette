@@ -2,10 +2,84 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:context="http://www.springframework.org/schema/context"
  xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:oxm="http://www.springframework.org/schema/oxm"
  xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context-4.2.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-4.2.xsd">
 
  <mvc:annotation-driven/>
-<context:component-scan base-package="com.gt" />
+ <context:annotation-config />
+<context:component-scan base-package="com.gt.controller" />
+<context:component-scan base-package="com.gt.beans" />
+<context:component-scan base-package="com.gt.dao" />
+<context:component-scan base-package="com.gt.hibernate" />
+<context:component-scan base-package="com.gt.services" />
+   
+<!-- <context:component-scan base-package="com.gt.dao" />
+<context:component-scan base-package="com.gt.services" />
+ <context:property-placeholder location="classpath:com/gt/properties/database.properties" />  
+  -->
+ <bean id="dataSource"  
+  class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+  <property name="driverClassName" value="com.mysql.jdbc.Driver" />  
+  <property name="url" value="jdbc:mysql://localhost:3306/roulette" />  
+  <property name="username" value="root" />  
+  <property name="password" value="" />  
+ </bean>  
+ 
 
+  
+ <bean id="sessionFactory"  
+  class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">  
+  <property name="dataSource" ref="dataSource" />  
+  <property name="annotatedClasses">    
+            <list>    
+                <value>com.gt.hibernate.Test</value>    
+            </list>    
+        </property>   
+  <property name="hibernateProperties">  
+   <props>  
+    <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>  
+    <prop key="hibernate.show_sql">${hibernate.show_sql:true}</prop>  
+   </props>  
+  </property>  
+ </bean>  
+ 
+ <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager" >
+<!-- <property name="dataSource" ref="dataSource"/> -->
+<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+   <bean id="dataDaoImpl" class="com.gt.dao.DataDaoImpl" >
+   <property name="sessionFactory" ref="sessionFactory"/>
+   </bean>  
+ <bean id="dataServiceImpl" class="com.gt.services.DataServiceImpl"  >
+ <property name="dataDaoImpl" ref="dataDaoImpl"/>
+ </bean> 
+  <bean id = "rouletteController" class ="com.gt.controller.RouletteController" >
+   <property name="dataServiceImpl" ref="dataServiceImpl"/>
+  </bean>
+
+ <bean id="persistenceExceptionTranslationPostProcessor"  
+  class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />  
+  
+    
+<!--  <bean  
+  class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+  <property name="prefix">  
+   <value>/WEB-INF/pages/</value>  
+  </property>  
+  <property name="suffix">  
+   <value>.jsp</value>  
+  </property>  
+ </bean>  --> 
+  
+  
+ 
+ <!-- <bean id="person" class="org.springframework.web.servlet.view.xml.MarshallingView">
+        <property name="contentType" value="application/xml"/>
+        <property name="marshaller" ref="marshaller"/>
+    </bean>
+
+    <oxm:jaxb2-marshaller id="marshaller">
+        <oxm:class-to-be-bound name="com.gt.beans.Header"/>
+    </oxm:jaxb2-marshaller> -->
 </beans>
