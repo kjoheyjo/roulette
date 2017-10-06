@@ -59,9 +59,9 @@ public class BetSeln {
     @XmlAttribute(name = "type")
     protected String type;
     @XmlAttribute(name = "payout")
-    protected Float payout;
+    protected int payout;
     @XmlAttribute(name = "min_stake")
-    protected String minStake;
+    protected float minStake;
     @XmlAttribute(name = "max_stake")
     protected Float maxStake;
     @XmlAttribute(name = "lifetime_type")
@@ -201,7 +201,7 @@ public class BetSeln {
      *     {@link Float }
      *     
      */
-    public Float getPayout() {
+    public int getPayout() {
         return payout;
     }
 
@@ -213,7 +213,7 @@ public class BetSeln {
      *     {@link Float }
      *     
      */
-    public void setPayout(Float value) {
+    public void setPayout(int value) {
         this.payout = value;
     }
 
@@ -225,7 +225,7 @@ public class BetSeln {
      *     {@link String }
      *     
      */
-    public String getMinStake() {
+    public float getMinStake() {
         return minStake;
     }
 
@@ -237,7 +237,7 @@ public class BetSeln {
      *     {@link String }
      *     
      */
-    public void setMinStake(String value) {
+    public void setMinStake(float value) {
         this.minStake = value;
     }
 

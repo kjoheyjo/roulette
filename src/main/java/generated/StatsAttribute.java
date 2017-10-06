@@ -43,7 +43,7 @@ public class StatsAttribute {
     protected String value;
     @XmlAttribute(name = "name")
     protected String name;
-    @XmlAttribute(name = "valueAttribute")
+    @XmlAttribute(name = "value")
     protected String valueAttribute;
     @XmlAttribute(name = "parameter")
     protected String parameter;
