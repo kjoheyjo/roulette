@@ -54,8 +54,13 @@
  <bean id="dataServiceImpl" class="com.gt.services.DataServiceImpl"  >
  <property name="dataDaoImpl" ref="dataDaoImpl"/>
  </bean> 
+ <bean id="webServiceCalling" class="com.gt.services.WebServiceCalling"  >
+ 
+ </bean> 
+ 
   <bean id = "rouletteController" class ="com.gt.controller.RouletteController" >
    <property name="dataServiceImpl" ref="dataServiceImpl"/>
+   <property name="webServiceCalling" ref="webServiceCalling"/>
   </bean>
 
  <bean id="persistenceExceptionTranslationPostProcessor"  
