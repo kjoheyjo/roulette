@@ -2,6 +2,7 @@ package com.gt.controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.List;
@@ -9,9 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +31,11 @@ import com.gt.hibernate.GtGameConfig;
 import com.gt.services.GtBetsServiceImpl;
 import com.gt.services.GtGameAccountServiceImpl;
 import com.gt.services.GtGameConfigServiceImpl;
+import com.gt.beans.ExceptionManagement;
+import com.gt.beans.ExceptionMassage;
+import com.gt.beans.UrlCall;
+import com.gt.services.WebServiceCalling;
+
 import generated.Account;
 import generated.Bet;
 import generated.BetDef;
@@ -60,6 +69,15 @@ public class RouletteController {
 	private GtBetsServiceImpl gtBetsServiceImpl;
 	private GtGameAccountServiceImpl gtGameAccountServiceImpl;
 	private GtGameConfigServiceImpl gtGameConfigServiceImpl;
+	
+	
+	private WebServiceCalling webServiceCalling;
+	private String domainName = "http://192.168.0.51:8090/gt_games_platform/";
+
+	@Autowired
+	public void setWebServiceCalling(WebServiceCalling webServiceCalling) {
+		this.webServiceCalling = webServiceCalling;
+	}
 
 	@Autowired(required=false)
 	public void setGtGameConfigServiceImpl(GtGameConfigServiceImpl gtGameConfigServiceImpl) {
@@ -86,7 +104,6 @@ public class RouletteController {
 		buildHeader(gameResponse,requestHeader);	// prepare header in gameResponse
 		buildInit(gameResponse);					// prepare init in gameResponse
 		buildStats(gameResponse);					// prepare stats in gameResponse
-
 		return gameResponse;
 	}
 
@@ -121,12 +138,14 @@ public class RouletteController {
 		Float stake = playRequest.getStake();
 		// INR stake - withdraw request to platform.
 
+		// Byte numBets = gameRequest.getBetState().getNumBets();
+
 		GameLogic logic = new GameLogic();
 		byte drawn = logic.spin((byte)0, false, (byte)0, (byte)36);
 		BetState responseBetState = logic.calculateWinnings(drawn,playRequest.getBetState());
 
 		Float totalWinnings = 0.00f;
-		for(Bet bet : responseBetState.getBet()) {
+		for (Bet bet : responseBetState.getBet()) {
 			totalWinnings += bet.getWinnings();
 		}
 
@@ -147,14 +166,13 @@ public class RouletteController {
 		bonusPromotion.setBonusName("BonusBar");
 		bonusPromotion.setBonusType("BBAR");
 		bonusPromotion.setEarnedPcnt(0.00f);
-		bonusPromotion.setAwardTarget((byte)100);
-		bonusPromotion.setPointsEarned((byte)0);
+		bonusPromotion.setAwardTarget((byte) 100);
+		bonusPromotion.setPointsEarned((byte) 0);
 		play.setBonusPromotion(bonusPromotion);
 
 		gameResponse.setPlay(play);
 
 	}
-
 
 	private void buildStats(GameResponse gameResponse) {
 		StatsAttribute statsAttribute = new StatsAttribute();
@@ -165,7 +183,6 @@ public class RouletteController {
 		stats.setStatsAttribute(statsAttribute);
 		gameResponse.setStats(stats);
 	}
-
 
 	private void buildInit(GameResponse gameResponse) {
 		
@@ -191,9 +208,9 @@ public class RouletteController {
 		betDef.setMaxNumber((byte)config.getMaxNumber());
 		betDef.setTotalDrawn((byte) config.getTotalDraws());
 		betDef.setDrawDuplicates(String.valueOf("1".equals(config.getDrawDuplicates())));
-		betDef.setNumDrawSets((byte)1);
+		betDef.setNumDrawSets((byte) 1);
 		betDef.setUseLaPartage("false");
-		betDef.setMaxGroups((byte)1);
+		betDef.setMaxGroups((byte) 1);
 		init.setBetDef(betDef);
 
 		// BetPayout
@@ -208,9 +225,9 @@ public class RouletteController {
 			betSeln.setLaPartageSeln("");
 			betSeln.setLifetimeType("T");
 			betSeln.setType("S");
-			betSeln.setPayoutIncr((float)0.00);
+			betSeln.setPayoutIncr((float) 0.00);
 			betSeln.setMthAct("T");
-			betSeln.setMthNo((byte)1);
+			betSeln.setMthNo((byte) 1);
 			betSeln.setSeln(betName.toString());
 			betSeln.setName(betName.name());
 			for(GtBets bet : bets) {
@@ -227,20 +244,20 @@ public class RouletteController {
 
 		FreeBetSummaryInit freeBetSummary = new FreeBetSummaryInit();		// FreeBetSummary
 		freeBetSummary.setAvailableBalance((float) 64.00);
-		freeBetSummary.setNumTokens((byte)1);
+		freeBetSummary.setNumTokens((byte) 1);
 		init.setFreebetSummary(freeBetSummary);
 
 		BonusPromotionInit bonusPromotion = new BonusPromotionInit();		// BonusPromotion
 		bonusPromotion.setBonusName("BonusBar");
 		bonusPromotion.setBonusType("BBAR");
-		bonusPromotion.setEarnedPcnt((float)0.0);
-		bonusPromotion.setAwardTarget((byte)100);
-		bonusPromotion.setPointsEarned((byte)0);
+		bonusPromotion.setEarnedPcnt((float) 0.0);
+		bonusPromotion.setAwardTarget((byte) 100);
+		bonusPromotion.setPointsEarned((byte) 0);
 		init.setBonusPromotion(bonusPromotion);
 
 		GameConfig gameConfig = new GameConfig();							// GameConfig
 		GameConfigSection gameConfigSection = new GameConfigSection();
-		gameConfigSection.setId((byte)1);
+		gameConfigSection.setId((byte) 1);
 		gameConfigSection.setName("Theme Configuration");
 		gameConfigSection.setAllowedActions("SetDefault");
 
@@ -264,7 +281,6 @@ public class RouletteController {
 		gameResponse.setInit(init);
 	}
 
-
 	private void buildHeader(GameResponse gameResponse, Header requestHeader) {
 		System.out.println("========== game request received ============");
 		String cookie = requestHeader.getCustomer().getCookie();
@@ -282,7 +298,7 @@ public class RouletteController {
 			gameId.setVer((byte) 1);
 			gameId.setChannel(channel);
 			responseHeader.setGameId(gameId);
-		}else if(requestHeader.getGameId() != null) {
+		} else if (requestHeader.getGameId() != null) {
 			responseHeader.setGameId(requestHeader.getGameId());
 		}
 
@@ -294,7 +310,6 @@ public class RouletteController {
 
 	}
 
-
 	private Account getAccountFromCookie(String cookie) {
 		// TODO Auto-generated method stub
 		Account account = new Account();
@@ -303,22 +318,33 @@ public class RouletteController {
 		account.setCcyDecimalSeparator(".");
 		account.setBalance((float)9090);
 		account.setCcyThousandSeparator(",");
-		account.setHeldFunds((float)22.00);
+		account.setHeldFunds((float) 22.00);
 		return account;
 	}
-
 
 	private Short getIdFromCookie(String cookie) {
 		// TODO Auto-generated method stub
 		return 1001;
 	}
 
-
 	private void checkCookie(String cookie) {
-		// TODO Auto-generated method stub
+		try {
+			// TODO Auto-generated method stub
+			HashMap<String, Object> requestesParameters = new HashMap<String, Object>();
+			String url = domainName + UrlCall.API_MY_ACCOUNT;
+			String response = webServiceCalling.sendPost(requestesParameters, url, cookie, false);
+
+			if (response != null) {
+				// Get LAst game details if not spain than init else send response of spin
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+			throw new ExceptionManagement(ExceptionMassage.ERROR_CODE_INTERNAL_SERVER,ExceptionMassage.ERROR_MSG_INTERNAL_SERVER);
+
+		}
 
 	}
-
 
 	@RequestMapping(value = "/data", method = RequestMethod.POST, consumes = "application/xml")
 	public @ResponseBody GameResponse getData(@RequestBody(required = true) Header header) {
