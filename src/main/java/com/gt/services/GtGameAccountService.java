@@ -1,0 +1,14 @@
+package com.gt.services;
+
+import java.util.List;
+
+import com.gt.hibernate.GtGameAccount;
+
+public interface GtGameAccountService {
+
+	void saveGameAccount(GtGameAccount gtGameAccount);
+    List<GtGameAccount> findAllGameAccount();
+    GtGameAccount findByGameId(int gameId);
+    void updateGameAccount(GtGameAccount gtGameAccount);
+
+}
