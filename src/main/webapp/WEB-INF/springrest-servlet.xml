@@ -9,58 +9,85 @@
 	<mvc:annotation-driven />
 	<context:annotation-config />
 	<context:component-scan base-package="com.gt" />
+	<context:component-scan base-package="com.gt.controller" />
 
 	<!-- <context:component-scan base-package="com.gt.dao" /> <context:component-scan 
 		base-package="com.gt.services" /> <context:property-placeholder location="classpath:com/gt/properties/database.properties" 
 		/> -->
-	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url"
-			value="jdbc:mysql://localhost:3306/gt_roulette_database" />
-		<property name="username" value="root" />
-		<property name="password" value="" />
-	</bean>
+	<beans profile="local">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+			<property name="url"
+				value="jdbc:mysql://localhost:3306/gt_roulette_database" /> <!--"jdbc:mysql://localhost:3306/gt_roulette_database" "jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" -->
+			<property name="username" value="root" />
+			<property name="password" value="" />   <!-- value="5wPl3245894okUV" -->
+		</bean>
+	</beans>
 
+	<beans profile="qa">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+			<property name="url"
+				value="jdbc:mysql://localhost:3306/gt_roulette_database" /> <!--"jdbc:mysql://localhost:3306/gt_roulette_database" "jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" -->
+			<property name="username" value="root" />
+			<property name="password" value="root123" />   <!-- value="5wPl3245894okUV" -->
+		</bean>
+	</beans>
 
+	<beans profile="staging">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+			<property name="url"
+				value="jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" /> <!--"jdbc:mysql://localhost:3306/gt_roulette_database" "jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" -->
+			<property name="username" value="gt3patti" />
+			<property name="password" value="5wPl3245894okUV" />   <!-- value="5wPl3245894okUV" -->
+		</bean>
+	</beans>
 
-	<bean id="sessionFactory"
-		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="packagesToScan">
-			<list>
-				<value>com.gt</value>
-			</list>
-		</property>
-		<property name="annotatedClasses">
-			<list>
-				<value>com.gt.hibernate.Test</value>
-				<value>com.gt.hibernate.GtBets</value>
-				<value>com.gt.hibernate.GtGameAccount</value>
-				<value>com.gt.hibernate.GtGameConfig</value>
-			</list>
-		</property>
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
-				<prop key="hibernate.show_sql">${hibernate.show_sql:true}</prop>
-			</props>
-		</property>
-	</bean>
+	<beans profile="prod">
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+			<property name="url"
+				value="jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" /> <!--"jdbc:mysql://localhost:3306/gt_roulette_database" "jdbc:mysql://gt3patti-beta.cnryuu2q53sh.ap-south-1.rds.amazonaws.com:3306/gt_roulette_database" -->
+			<property name="username" value="live username" />
+			<property name="password" value="live password" />   
+		</bean>
+	</beans>
 
-	<bean id="transactionManager"
-		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<!-- <property name="dataSource" ref="dataSource"/> -->
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
+	<beans profile="local, qa, staging, prod">
+		<bean id="sessionFactory"
+			class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+			<property name="dataSource" ref="dataSource" />
+			<property name="packagesToScan">
+				<list>
+					<value>com.gt</value>
+				</list>
+			</property>
+			<property name="hibernateProperties">
+				<props>
+					<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+					<prop key="hibernate.show_sql">${hibernate.show_sql:true}</prop>
+				</props>
+			</property>
+		</bean>
 
-	<bean id="dao" abstract="true" class="com.gt.dao.BaseHibernateDAO">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
+		<bean id="transactionManager"
+			class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+			<!-- <property name="dataSource" ref="dataSource"/> -->
+			<property name="sessionFactory" ref="sessionFactory" />
+		</bean>
 
-	<bean id="persistenceExceptionTranslationPostProcessor"
-		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+		<bean id="dao" abstract="true" class="com.gt.dao.BaseHibernateDAO">
+			<property name="sessionFactory" ref="sessionFactory" />
+		</bean>
 
+		<bean id="persistenceExceptionTranslationPostProcessor"
+			class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+	</beans>
 
 	<!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
 		<property name="prefix"> <value>/WEB-INF/pages/</value> </property> <property 
