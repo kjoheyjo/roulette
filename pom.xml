@@ -8,11 +8,20 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>roulette Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+	<repositories>
+		<repository>
+			<!-- DO NOT set id to "local" because it is reserved by Maven -->
+			<id>lib</id>
+			<url>file://${project.basedir}/lib</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -78,15 +87,14 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
-
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>jaxb2-maven-plugin</artifactId> 
-				<version>1.6</version> <executions> <execution> <id>xjc</id> <goals> <goal>xjc</goal> 
-				</goals> </execution> </executions> <configuration> <arguments>-b ${project.basedir}/src/main/xsd/binding.xml</arguments> 
-				<schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory> 
-				<outputDirectory>${project.basedir}/src/main/java</outputDirectory> <clearOutputDir>false</clearOutputDir> 
-				<properties> <property> <name>javax.xml.accessExternalSchema</name> <value>all</value> 
-				</property> <property> <name>javax.xml.accessExternalDTD</name> <value>all</value> 
-				</property> </properties> </configuration> </plugin> -->
+		<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>jaxb2-maven-plugin</artifactId> 
+			<version>1.6</version> <executions> <execution> <id>xjc</id> <goals> <goal>xjc</goal> 
+			</goals> </execution> </executions> <configuration> <arguments>-b ${project.basedir}/src/main/xsd/binding.xml</arguments> 
+			<schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory> 
+			<outputDirectory>${project.basedir}/src/main/java</outputDirectory> <clearOutputDir>false</clearOutputDir> 
+			<properties> <property> <name>javax.xml.accessExternalSchema</name> <value>all</value> 
+			</property> <property> <name>javax.xml.accessExternalDTD</name> <value>all</value> 
+			</property> </properties> </configuration> </plugin> -->
 
 		<!-- MySQL -->
 		<dependency>
@@ -94,6 +102,29 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.connector.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.java-json</groupId>
+			<artifactId>json</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.http</groupId>
+			<artifactId>http-request</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>4.1.6.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<finalName>roulette</finalName>
