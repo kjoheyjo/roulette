@@ -196,9 +196,11 @@ public class RouletteEngine {
 
 			// check cash type for this spin.
 			if(gameRequest.getPlay().getFreebets().equals("Yes")) {
-				cashType = 3;			// 3 - dummy
+				cashType = 0;			// 3 - dummy
+				System.out.println("cash type " + cashType);
 			}else {
 				cashType = 0;			// 0 - real
+				System.out.println("cash type no " + cashType);
 			}
 
 			// if no active game exists, create new gameAccount

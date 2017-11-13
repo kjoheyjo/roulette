@@ -10,12 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +29,9 @@ import com.gt.services.GtBetsServiceImpl;
 import com.gt.services.GtGameAccountServiceImpl;
 import com.gt.services.GtGameConfigServiceImpl;
 import com.gt.beans.ExceptionManagement;
-import com.gt.beans.ExceptionMassage;
+import com.gt.beans.ExceptionMessage;
+import com.gt.beans.GameObject;
+import com.gt.beans.RouletteEngine;
 import com.gt.beans.UrlCall;
 import com.gt.services.WebServiceCalling;
 
@@ -47,7 +46,7 @@ import generated.BonusPromotion;
 import generated.BonusPromotionInit;
 import generated.Close;
 import generated.Customer;
-import generated.FreeBetSummaryInit;
+import generated.FreeBetSummary;
 import generated.GameConfig;
 import generated.GameConfigSection;
 import generated.GameId;
@@ -65,15 +64,13 @@ import org.apache.log4j.Logger;
 @RestController
 public class RouletteController {
 
-	private static final Logger logger = Logger.getLogger(RouletteController.class);
+	private static final Logger LOGGER = Logger.getLogger(RouletteController.class);
 	private GtBetsServiceImpl gtBetsServiceImpl;
 	private GtGameAccountServiceImpl gtGameAccountServiceImpl;
 	private GtGameConfigServiceImpl gtGameConfigServiceImpl;
-	
-	
 	private WebServiceCalling webServiceCalling;
-	private String domainName = "http://192.168.0.51:8090/gt_games_platform/";
-
+	private RouletteEngine rouletteEngine;
+	//private final static String API_BASE_URL = "http://192.168.0.51:8090/gt_games_platform/";//"http://35.154.245.194/";
 	@Autowired
 	public void setWebServiceCalling(WebServiceCalling webServiceCalling) {
 		this.webServiceCalling = webServiceCalling;
@@ -94,43 +91,102 @@ public class RouletteController {
 		this.gtGameAccountServiceImpl = gtGameAccountServiceImpl;
 	}
 
+	@Autowired(required=false)
+	public void setRouletteEngine(RouletteEngine rouletteEngine) {
+		this.rouletteEngine = rouletteEngine;
+	}
+
 	@CrossOrigin()
 	@RequestMapping(value= "/init",method = RequestMethod.POST, consumes= "application/xml")
-	public @ResponseBody GameResponse getInit(  @RequestBody(required = true) GameRequest gameRequest,HttpServletRequest req) {
-		logger.info("init call");
-		printRequestInfo(req);
-		Header requestHeader = gameRequest.getHeader();
-		GameResponse gameResponse = new GameResponse();
-		buildHeader(gameResponse,requestHeader);	// prepare header in gameResponse
-		buildInit(gameResponse);					// prepare init in gameResponse
-		buildStats(gameResponse);					// prepare stats in gameResponse
-		return gameResponse;
+	public @ResponseBody GameResponse testInit( @RequestBody(required = true) GameRequest gameRequest,HttpServletRequest req) {
+		try {
+			LOGGER.info("init call");
+			System.out.println("init call");
+			printRequestInfo(req);
+
+			GameObject gameObj = rouletteEngine.init(gameRequest);
+			GameResponse gameResponse = new GameResponse();
+
+			buildHeader(gameResponse,gameRequest.getHeader());	
+			buildInit(gameResponse);					
+			buildStats(gameResponse,gameObj);		
+			FreeBetSummary freeBetSummary = new FreeBetSummary(gameObj.getDummyBalance(),1);
+			gameResponse.getInit().setFreebetSummary(freeBetSummary);
+			gameResponse.getHeader().getCustomer().getAccount().setBalance(gameObj.getRealBalance());
+
+			if(gameObj.getResultInfo()!=null) {
+				// append spin response
+				Play play = new Play();
+				play.setStake(gameObj.getResultInfo().getStake());
+				play.setWin(gameObj.getResultInfo().getWinnings());
+				play.setBetState(gameObj.getBetState());
+
+				BonusPromotion bonusPromotion = new BonusPromotion();
+				bonusPromotion.setBonusName("BonusBar");
+				bonusPromotion.setBonusType("BBAR");
+				bonusPromotion.setEarnedPcnt(0.00f);
+				bonusPromotion.setAwardTarget((byte) 100);
+				bonusPromotion.setPointsEarned((byte) 0);
+				play.setBonusPromotion(bonusPromotion);
+
+				gameResponse.setPlay(play);
+			}
+
+			return gameResponse;
+		} catch (ExceptionManagement e) {
+			e.printStackTrace();
+			System.out.println("controller exception");
+			throw new ExceptionManagement(e.getErrorCode(), e.getErrorMessage());
+		}
 	}
 
 	@CrossOrigin()
 	@RequestMapping(value= "/spin",method = RequestMethod.POST, consumes= "application/xml")
-	public @ResponseBody GameResponse getSpin(  @RequestBody(required = true) GameRequest gameRequest) {
-		logger.info("spin call");
-		Header requestHeader = gameRequest.getHeader();
-		GameResponse gameResponse = new GameResponse();
-		buildHeader(gameResponse,requestHeader);	// prepare header in gameResponse
-		buildPlay(gameResponse,gameRequest);		// prepare play in gameResponse
-		gameResponse.getHeader().getCustomer().getAccount().setBalance((float) 9078.00);
+	public @ResponseBody GameResponse testSpin(  @RequestBody(required = true) GameRequest gameRequest) {
+		LOGGER.info("spin call");
+		try {
+			GameObject gameObj = rouletteEngine.spin(gameRequest);
 
-		return gameResponse;
+			if(gameObj != null) {
+				return buildGameResponse(gameObj,gameRequest);
+
+			}else {
+				return null;
+			}
+		} catch (ExceptionManagement e) {
+			e.printStackTrace();
+			System.out.println("controller exception");
+			throw new ExceptionManagement(e.getErrorCode(), e.getErrorMessage());
+		}
+
 	}
 
 	@CrossOrigin()
 	@RequestMapping(value= "/close",method = RequestMethod.POST, consumes= "application/xml")
-	public @ResponseBody GameResponse close(  @RequestBody(required = true) GameRequest gameRequest) {
-		logger.info("close call");
-		Header requestHeader = gameRequest.getHeader();
+	public @ResponseBody GameResponse testClose(  @RequestBody(required = true) GameRequest gameRequest) {
+		LOGGER.info("close call");
+		GameObject gameObj = null;
+		try {
+			gameObj = rouletteEngine.close(gameRequest);
+		} catch (ExceptionManagement e) {
+			e.printStackTrace();
+			System.out.println("controller exception");
+			throw new ExceptionManagement(e.getErrorCode(), e.getErrorMessage());
+		}
 		GameResponse gameResponse = new GameResponse();
-		buildHeader(gameResponse,requestHeader);	// prepare header in gameResponse
-		gameResponse.getHeader().getCustomer().getAccount().setBalance((float) 9078.00);
+		buildHeader(gameResponse,gameRequest.getHeader());	
 		gameResponse.setClose(new Close());
-
+		gameResponse.getHeader().setGameId(gameRequest.getHeader().getGameId());
+		if(gameObj != null) {
+			gameResponse.getHeader().getCustomer().getAccount().setBalance(gameObj.getRealBalance());
+		}
 		return gameResponse;
+	}
+	
+	@CrossOrigin
+	@RequestMapping(value="/pageNotFound")
+	public @ResponseBody ExceptionManagement pageNotFound() {
+		throw new ExceptionManagement(ExceptionMessage.ERROR_CODE_MALFORMED_URL, ExceptionMessage.ERROR_MSG_MALFORMED_URL);
 	}
 
 	private void buildPlay(GameResponse gameResponse, GameRequest gameRequest) {
@@ -160,7 +216,6 @@ public class RouletteController {
 		play.setId((short) 1904);
 		play.setWin(totalWinnings);
 		play.setBetState(responseBetState);
-		play.setStake(stake);
 
 		BonusPromotion bonusPromotion = new BonusPromotion();
 		bonusPromotion.setBonusName("BonusBar");
@@ -174,10 +229,19 @@ public class RouletteController {
 
 	}
 
-	private void buildStats(GameResponse gameResponse) {
+	private void buildStats(GameResponse gameResponse,final GameObject gameObj) {
 		StatsAttribute statsAttribute = new StatsAttribute();
 		statsAttribute.setName("Bet");
-		statsAttribute.setValueAttribute("19|4|36|27");
+		String draws = "";
+		if(!gameObj.getLastDraws().isEmpty()) {
+			for(int draw : gameObj.getLastDraws()) {
+				draws += draw + "|";
+			}
+			draws = draws.substring(0, draws.length()-1);
+		}else {
+			draws = "12|23|14|35|1";
+		}
+		statsAttribute.setValueAttribute(draws);
 
 		Stats stats = new Stats();
 		stats.setStatsAttribute(statsAttribute);
@@ -185,9 +249,9 @@ public class RouletteController {
 	}
 
 	private void buildInit(GameResponse gameResponse) {
-		
+
 		GtGameConfig config = gtGameConfigServiceImpl.findConfigByDomain("localhost");
-		
+
 		Init init = new Init();
 		init.setMaxAnimTime((short) config.getMaxAnimationTime());
 		init.setMinAnimTime((short)config.getMinAnimationTime());
@@ -216,7 +280,7 @@ public class RouletteController {
 		// BetPayout
 		BetPayout betPayout = new BetPayout();
 		betPayout.setTotal((byte)121);
-		
+
 		String betType = "";
 		List<GtBets> bets = gtBetsServiceImpl.findAllBetsByConfigId(config.getGameConfigId());
 		for(BetName betName : BetName.values()){
@@ -237,13 +301,13 @@ public class RouletteController {
 					betSeln.setPayout(bet.getPayout());
 				}
 			}
-			
+
 			betPayout.getBetSeln().add(betSeln);
 		}
 		init.setBetPayout(betPayout);
 
-		FreeBetSummaryInit freeBetSummary = new FreeBetSummaryInit();		// FreeBetSummary
-		freeBetSummary.setAvailableBalance((float) 64.00);
+		FreeBetSummary freeBetSummary = new FreeBetSummary();		// FreeBetSummary
+		freeBetSummary.setAvailableBalance((double) 64.00);
 		freeBetSummary.setNumTokens((byte) 1);
 		init.setFreebetSummary(freeBetSummary);
 
@@ -264,7 +328,7 @@ public class RouletteController {
 		Theme theme1 = new Theme();
 		Theme theme2 = new Theme();
 		Theme theme3 = new Theme();
-		
+
 		theme1.setName("Futuristic");		// theme 1
 		theme1.setSelected("NO");
 		theme2.setName("Nautical");			// theme 2
@@ -281,33 +345,69 @@ public class RouletteController {
 		gameResponse.setInit(init);
 	}
 
-	private void buildHeader(GameResponse gameResponse, Header requestHeader) {
-		System.out.println("========== game request received ============");
-		String cookie = requestHeader.getCustomer().getCookie();
-		System.out.println("cookie received " + cookie);
+	private void buildHeader(GameResponse gameResponse, final Header requestHeader) {
+		Header header = new Header();
 
 		Header responseHeader = new Header();		// create reponse header
-		checkCookie(cookie);						// check cookie
-
-		if(requestHeader.getGameDetails() != null) {		// get channel from  requestHeader
-			String channel = requestHeader.getGameDetails().getChannel();
-			System.out.println("channel " + channel);
-			GameId gameId = new GameId();			// set GameId in response header
-			Short id = getIdFromCookie(cookie);
-			gameId.setId(id);
-			gameId.setVer((byte) 1);
-			gameId.setChannel(channel);
-			responseHeader.setGameId(gameId);
-		} else if (requestHeader.getGameId() != null) {
-			responseHeader.setGameId(requestHeader.getGameId());
-		}
+		//<GameId id='303' ver='1' channel='I' />
+		GameId gameId= new GameId();
+		gameId.setId(303);
+		gameId.setChannel("I");
+		gameId.setVer((byte)1);
+		responseHeader.setGameId(gameId);
 
 		Customer customer = new Customer();			// set Customer in repsponse header
-		Account account = getAccountFromCookie(cookie);
+		Account account = new Account();
+		account.setAdjustedFreeBalance("No");
+		account.setCcyCode("INR");
+		account.setCcyDecimalSeparator(".");
+		account.setCcyThousandSeparator(",");
+		account.setHeldFunds((float) 00.00);
+		//account.setBalance(100000);
 		customer.setAccount(account);
 		responseHeader.setCustomer(customer);
 		gameResponse.setHeader(responseHeader);
 
+	}
+
+	private GameResponse buildGameResponse(GameObject gameObj, final GameRequest gameRequest) {
+		GameResponse gameResponse = new GameResponse();
+		Header header = new Header();
+		GameId gameId = new GameId(gameObj.getGameId(),gameRequest.getHeader().getGameId().getVer(),
+				gameRequest.getHeader().getGameId().getChannel());
+
+		Customer customer = new Customer();				
+		Account account = new Account();
+		account.setAdjustedFreeBalance("No");
+		account.setCcyCode("INR");
+		account.setCcyDecimalSeparator(".");
+		account.setCcyThousandSeparator(",");
+		account.setBalance(gameObj.getRealBalance());
+		customer.setAccount(account);
+
+		header.setCustomer(customer);
+		header.setGameId(gameId);
+		gameResponse.setHeader(header);
+
+		Play play = new Play();
+		play.setStake(gameObj.getResultInfo().getStake());
+		play.setWin(gameObj.getResultInfo().getWinnings());
+		play.setBetState(gameObj.getBetState());
+
+		BonusPromotion bonusPromotion = new BonusPromotion();
+		bonusPromotion.setBonusName("BonusBar");
+		bonusPromotion.setBonusType("BBAR");
+		bonusPromotion.setEarnedPcnt(0.00f);
+		bonusPromotion.setAwardTarget((byte) 100);
+		bonusPromotion.setPointsEarned((byte) 0);
+		play.setBonusPromotion(bonusPromotion);
+
+		FreeBetSummary freeBetSummary = new FreeBetSummary(gameObj.getDummyBalance(),1);
+		play.setFreebetSummary(freeBetSummary);
+
+		gameResponse.setPlay(play);
+
+		return gameResponse;
 	}
 
 	private Account getAccountFromCookie(String cookie) {
@@ -327,11 +427,11 @@ public class RouletteController {
 		return 1001;
 	}
 
-	private void checkCookie(String cookie) {
+	private void checkCookie(String cookie) {/*
 		try {
 			// TODO Auto-generated method stub
 			HashMap<String, Object> requestesParameters = new HashMap<String, Object>();
-			String url = domainName + UrlCall.API_MY_ACCOUNT;
+			String url = API_BASE_URL + UrlCall.API_MY_ACCOUNT;
 			String response = webServiceCalling.sendPost(requestesParameters, url, cookie, false);
 
 			if (response != null) {
@@ -340,11 +440,11 @@ public class RouletteController {
 		} catch (Exception e) {
 			System.out.println(e);
 			e.printStackTrace();
-			throw new ExceptionManagement(ExceptionMassage.ERROR_CODE_INTERNAL_SERVER,ExceptionMassage.ERROR_MSG_INTERNAL_SERVER);
+			throw new ExceptionManagement(ExceptionMessage.ERROR_CODE_INTERNAL_SERVER,ExceptionMessage.ERROR_MSG_INTERNAL_SERVER);
 
 		}
 
-	}
+	*/}
 
 	@RequestMapping(value = "/data", method = RequestMethod.POST, consumes = "application/xml")
 	public @ResponseBody GameResponse getData(@RequestBody(required = true) Header header) {
@@ -367,21 +467,73 @@ public class RouletteController {
 		StringBuffer requestURL = req.getRequestURL();
 		String queryString = req.getQueryString();
 		if (queryString == null) {
-			logger.info("url: " + requestURL.toString());
+			LOGGER.info("url: " + requestURL.toString());
+			System.out.println("url: " + requestURL.toString());
 		} else {
-			logger.info("url: " + requestURL.append('?').append(queryString).toString());
+			LOGGER.info("url: " + requestURL.append('?').append(queryString).toString());
+			System.out.println("url: " + requestURL.append('?').append(queryString).toString());
 		}
-		logger.info( "method:" + req.getMethod());
+		LOGGER.info( "method:" + req.getMethod());
+		System.out.println( "method:" + req.getMethod());
 		Enumeration headerNames = req.getHeaderNames();
 		while(headerNames.hasMoreElements()) {
 			String headerName = (String)headerNames.nextElement();
-			logger.info("header: " + headerName + ":" + req.getHeader(headerName));
+			LOGGER.info("header: " + headerName + ":" + req.getHeader(headerName));
+			System.out.println("header: " + headerName + ":" + req.getHeader(headerName));
 		}
 		Map<String, String[]> params = req.getParameterMap();
 		for(Entry<String, String[]> s : params.entrySet()){
 			String paramName = "";
-			logger.info("Attribute: '"+paramName+"', Value: '"+req.getParameter(paramName) + "'");
+			LOGGER.info("Attribute: '"+paramName+"', Value: '"+req.getParameter(paramName) + "'");
+			System.out.println("Attribute: '"+paramName+"', Value: '"+req.getParameter(paramName) + "'");
 		}
 	}
+
+	@CrossOrigin()
+	@RequestMapping(value= "/testInit",method = RequestMethod.POST, consumes= "application/xml")
+	public @ResponseBody GameResponse getInit( @RequestBody(required = true) GameRequest gameRequest,HttpServletRequest req) {
+		System.out.println("init call");
+		printRequestInfo(req);
+//		String cookie = "98e34d690cd6bb9c469a14483007e74e";
+//		checkCookie(cookie);
+		GameResponse gr = new GameResponse();
+		buildHeader(gr, gameRequest.getHeader());
+		buildInit(gr);
+		buildStats(gr,new GameObject(11, 123));
+
+		return gr;
+	}
+	
+	/*
+	@CrossOrigin()
+	@RequestMapping(value= "/spin",method = RequestMethod.POST, consumes= "application/xml")
+	public @ResponseBody GameResponse getSpin( @RequestBody(required = true) GameRequest gameRequest) {
+		logger.info("spin call");
+		GameResponse gr = new GameResponse();
+		try {
+
+		//GameObject gameObj = rouletteEngine.spin(gameRequest);
+
+		buildHeader(gr,gameRequest.getHeader());		
+		buildPlay(gr,gameRequest);			
+		gr.getHeader().getCustomer().getAccount().setBalance((float) 9078.00);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return gr;
+	}
+
+	@CrossOrigin()
+	@RequestMapping(value= "/close",method = RequestMethod.POST, consumes= "application/xml")
+	public @ResponseBody GameResponse getClose( @RequestBody(required = true) GameRequest gameRequest) {
+		logger.info("close call");
+		//GameObject gameObj = rouletteEngine.close(gameRequest);
+		GameResponse gr = new GameResponse();
+		buildHeader(gr,gameRequest.getHeader());	
+		gr.getHeader().getCustomer().getAccount().setBalance((float) 9078.00);
+		gr.setClose(new Close());
+
+		return gr;
+	}*/
 
 }
