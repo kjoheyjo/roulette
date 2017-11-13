@@ -12,9 +12,9 @@ public class ExceptionManagement extends RuntimeException  {
 	
 	@XmlAttribute(name="id")
 	private static final long serialVersionUID = 1L;
-	@XmlElement(name="error_code")
+	@XmlAttribute(name="error_code")
 	private int errorCode;
-	@XmlElement(name="error_message")
+	@XmlAttribute(name="error_message")
 	private String errorMessage;
 	
 	public ExceptionManagement() {
