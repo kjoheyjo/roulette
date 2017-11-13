@@ -10,7 +10,7 @@ import generated.BetState;
 
 public class GameLogic {
 	
-	public byte spin(byte numToDraw, boolean isBiased,byte lower, byte upper) {
+	public byte spin(byte numToDraw,boolean isBiased,byte lower,byte upper) {
 		if(upper < lower) {
 			return -1;
 		}
@@ -23,7 +23,7 @@ public class GameLogic {
 		}
 	}
 
-	public BetState calculateWinnings(byte drawn, BetState requestBetState) {
+	public BetState calculateWinnings(byte drawn,BetState requestBetState) {
 		BetState responseBetState = new BetState();
 		responseBetState.setTotalBets(requestBetState.getNumBets());
 		responseBetState.setDrawn(drawn);
@@ -40,11 +40,11 @@ public class GameLogic {
 			}else {
 				bets = new String[1];
 				bets[0] = bet.getSeln();
-				System.out.println(selection);
+				//System.out.println(selection);
 			}
 			
 			for(String s : bets) {
-				System.out.println(s);
+				//System.out.println(s);
 				if((byte)Integer.parseInt(s) == drawn) {
 					hit = true;
 					break;
@@ -64,9 +64,9 @@ public class GameLogic {
 	}
 
 	private float getPayout(Bet bet) {
-		System.out.println("inside get payout");
+		//System.out.println("inside get payout");
 		BetName betName = BetName.valueOf(bet.getName());
-		System.out.println("bet " + betName.name() + " " + betName.toString());
+		//System.out.println("bet " + betName.name() + " " + betName.toString());
 		if(betName.toString().split("\\|").length == 1){
 			return 36.0f;
 		}else if(betName.toString().split("\\|").length == 2){

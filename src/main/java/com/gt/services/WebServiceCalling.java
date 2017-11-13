@@ -40,6 +40,7 @@ public class WebServiceCalling {
 		for (Map.Entry<String, Object> entry : requestesParameters.entrySet()) {
 			try {
 				jsonParam.put(entry.getKey(), entry.getValue());
+				System.out.println(entry.getKey() + " " + entry.getValue());
 			} catch (JSONException e) {
 				e.printStackTrace();
 				throw e;
