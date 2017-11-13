@@ -41,4 +41,15 @@ public class GtGameAccountServiceImpl implements GtGameAccountService {
 		dao.updateGameAccount(gtGameAccount);
 	}
 
+	@Override
+	public GtGameAccount findActiveGameByPlayerId(int playerId) {
+		return dao.findActiveGameByPlayerId(playerId);
+	}
+	
+	@Override
+	public List<GtGameAccount> findRecentGames() {
+		// TODO Auto-generated method stub
+		return dao.findRecentGames();
+	}
+
 }

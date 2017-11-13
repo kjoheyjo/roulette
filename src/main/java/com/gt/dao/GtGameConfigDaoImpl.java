@@ -28,11 +28,17 @@ public class GtGameConfigDaoImpl extends BaseHibernateDAO implements GtGameConfi
 				queryObject = session.createQuery(queryString);
 				queryObject.setParameter(0, value);
 				tx.commit();
+				return queryObject.list();
 			} catch (Exception e) {
+				
 				tx.rollback();
 				e.printStackTrace();
+			}finally {
+				if(session!=null && session.isOpen()) {
+					session.close();
+				}
 			}
-			return queryObject.list();
+			return null;
 		} catch (RuntimeException re) {
 			throw re;
 		}
@@ -46,6 +52,9 @@ public class GtGameConfigDaoImpl extends BaseHibernateDAO implements GtGameConfi
 			session.persist(gtGameConfig);
 			tx.commit();
 		} catch (Exception e) {
+			if(session!=null && session.isOpen()) {
+				session.close();
+			}
 			tx.rollback();
 			e.printStackTrace();
 		}
@@ -63,6 +72,9 @@ public class GtGameConfigDaoImpl extends BaseHibernateDAO implements GtGameConfi
 			tx.commit();
 			return queryObject.list();
 		} catch (RuntimeException re) {
+			if(session!=null && session.isOpen()) {
+				session.close();
+			}
 			tx.rollback();
 			throw re;
 		}

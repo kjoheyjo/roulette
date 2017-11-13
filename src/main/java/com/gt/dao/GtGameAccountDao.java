@@ -9,4 +9,6 @@ public interface GtGameAccountDao {
     List<GtGameAccount> findAllGameAccount();
     GtGameAccount findByGameId(int gameId);
     void updateGameAccount(GtGameAccount gtGameAccount);
+    GtGameAccount findActiveGameByPlayerId(int playerId);
+	List<GtGameAccount> findRecentGames();
 }

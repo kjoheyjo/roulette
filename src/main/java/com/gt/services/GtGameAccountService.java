@@ -10,5 +10,7 @@ public interface GtGameAccountService {
     List<GtGameAccount> findAllGameAccount();
     GtGameAccount findByGameId(int gameId);
     void updateGameAccount(GtGameAccount gtGameAccount);
+    GtGameAccount findActiveGameByPlayerId(int playerId);
+	List<GtGameAccount> findRecentGames();
 
 }

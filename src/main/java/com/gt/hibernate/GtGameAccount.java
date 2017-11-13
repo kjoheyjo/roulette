@@ -13,36 +13,44 @@ import javax.persistence.Table;
 @Table(name="gt_game_account")
 public class GtGameAccount {
 	@Id
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
 	private int id;
 	@Column(name="player_id")
-	private long playerId;
-	@Column(name="game_id")
-	private int gameId;
+	private int playerId;
 	@Column(name="state")
 	private int state;		// 0 -> init, 1 -> spin, 2 -> close
+	@Column(name="bet_amount")
+	private float betAmount;
+	@Column(name="draw")
+	private int draw;
+	@Column(name="winnings")
+	private float winnings;
 	@Column(name="modified_date")
 	private Timestamp modifiedDate;
 	@Column(name="created_date")
 	private Timestamp createdDate;
 	
-	public GtGameAccount(int id, long playerId, int gameId, int state, Timestamp modifiedDate, Timestamp createdDate) {
+	public GtGameAccount(int id, int playerId, int state, Timestamp modifiedDate, Timestamp createdDate) {
 		super();
 		this.id = id;
 		this.playerId = playerId;
-		this.gameId = gameId;
 		this.state = state;
 		this.modifiedDate = modifiedDate;
 		this.createdDate = createdDate;
 	}
 	
-	public GtGameAccount(long playerId, int gameId, int state, Timestamp modifiedDate, Timestamp createdDate) {
+	public GtGameAccount(int playerId, int state, Timestamp modifiedDate, Timestamp createdDate) {
 		this.playerId = playerId;
-		this.gameId = gameId;
 		this.state = state;
 		this.modifiedDate = modifiedDate;
 		this.createdDate = createdDate;
+	}
+	
+	public GtGameAccount(int playerId, int state, Timestamp modifiedDate) {
+		this.playerId = playerId;
+		this.state = state;
+		this.modifiedDate = modifiedDate;
 	}
 
 	public GtGameAccount() {
@@ -57,20 +65,12 @@ public class GtGameAccount {
 		this.id = id;
 	}
 
-	public long getPlayerId() {
+	public int getPlayerId() {
 		return playerId;
 	}
 
-	public void setPlayerId(long playerId) {
+	public void setPlayerId(int playerId) {
 		this.playerId = playerId;
-	}
-
-	public int getGameId() {
-		return gameId;
-	}
-
-	public void setGameId(int gameId) {
-		this.gameId = gameId;
 	}
 
 	public int getState() {
@@ -97,10 +97,35 @@ public class GtGameAccount {
 		this.createdDate = createdDate;
 	}
 
+	public float getBetAmount() {
+		return betAmount;
+	}
+
+	public void setBetAmount(float betAmount) {
+		this.betAmount = betAmount;
+	}
+
+	public int getDraw() {
+		return draw;
+	}
+
+	public void setDraw(int draw) {
+		this.draw = draw;
+	}
+
+	public float getWinnings() {
+		return winnings;
+	}
+
+	public void setWinnings(float winnings) {
+		this.winnings = winnings;
+	}
+
 	@Override
 	public String toString() {
-		return "GtGameAccount [id=" + id + ", playerId=" + playerId + ", gameId=" + gameId + ", state=" + state
-				+ ", modifiedDate=" + modifiedDate + ", createdDate=" + createdDate + "]";
+		return "GtGameAccount [id=" + id + ", playerId=" + playerId + ", state=" + state
+				+ ", betAmount=" + betAmount + ", draw=" + draw + ", winnings=" + winnings + ", modifiedDate="
+				+ modifiedDate + ", createdDate=" + createdDate + "]";
 	}
 	
 	
