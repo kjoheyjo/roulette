@@ -7,7 +7,7 @@
 	<display-name>Archetype Created Web Application</display-name>
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
-		<param-value>local</param-value> 
+		<param-value>qa</param-value> 
 	</context-param>
 	<servlet>
 		<servlet-name>springrest</servlet-name>

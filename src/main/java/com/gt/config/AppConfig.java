@@ -2,7 +2,6 @@ package com.gt.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +16,13 @@ import org.springframework.context.annotation.PropertySource;
   *
   */
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.gt.beans.Config;
 @Configuration
 @PropertySource("classpath:application-test.properties")
 @ComponentScan(basePackages = "com.gt")
+@EnableScheduling
 public class AppConfig {
 	
 	@Autowired
@@ -33,7 +34,7 @@ public class AppConfig {
 		return new Config(env.getProperty("api.testUrl"));
 	}
 	@Bean(name="config")
-	@Profile("test")
+	@Profile("qa")
 	public Config test() {
 		return new Config(env.getProperty("api.testUrl"));
 	}

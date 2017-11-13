@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 public class Config {
 	private String apiBaseUrl;
 	
+	public Config() {
+	}
+
 	public Config(String apiBaseUrl) {
 		this.apiBaseUrl = apiBaseUrl;
 	}

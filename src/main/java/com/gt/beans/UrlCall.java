@@ -4,7 +4,7 @@ public enum UrlCall {
 
 API_BADCOMMAND(""),
 API_MY_ACCOUNT("user/finance/get_user_balance"),
-API_WITHDREW("user/finance/withdraw"),
+API_WITHDRAW("user/finance/withdraw"),
 API_DEPOSIT("user/finance/server_deposit"),
 API_TRANSACTION_HISTORY("user/finance/server_create_game_transaction"),
 API_WAGER_RECORD("user/finance/create_user_wager");
