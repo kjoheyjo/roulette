@@ -39,14 +39,23 @@ import javax.xml.bind.annotation.XmlValue;
 })
 public class FreeBetSummary {
 
-    @XmlValue
+	@XmlValue
     protected String value;
     @XmlAttribute(name = "available_balance")
-    protected Float availableBalance;
+    protected Double availableBalance;
     @XmlAttribute(name = "num_tokens")
-    protected Byte numTokens;
+    protected int numTokens;
+    
+    public FreeBetSummary(Double availableBalance, int numTokens) {
+		this.availableBalance = availableBalance;
+		this.numTokens = numTokens;
+	}
+    
+    public FreeBetSummary() {
+		
+	}
 
-    /**
+	/**
      * Gets the value of the value property.
      * 
      * @return
@@ -78,7 +87,7 @@ public class FreeBetSummary {
      *     {@link Float }
      *     
      */
-    public Float getAvailableBalance() {
+    public Double getAvailableBalance() {
         return availableBalance;
     }
 
@@ -90,7 +99,7 @@ public class FreeBetSummary {
      *     {@link Float }
      *     
      */
-    public void setAvailableBalance(Float value) {
+    public void setAvailableBalance(Double value) {
         this.availableBalance = value;
     }
 
@@ -102,7 +111,7 @@ public class FreeBetSummary {
      *     {@link Byte }
      *     
      */
-    public Byte getNumTokens() {
+    public int getNumTokens() {
         return numTokens;
     }
 
@@ -114,7 +123,7 @@ public class FreeBetSummary {
      *     {@link Byte }
      *     
      */
-    public void setNumTokens(Byte value) {
+    public void setNumTokens(int value) {
         this.numTokens = value;
     }
 

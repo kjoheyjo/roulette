@@ -186,7 +186,7 @@ public class Init {
     @XmlElement(name = "BetPayout", required = false)
     protected BetPayout betPayout;
     @XmlElement(name = "FreebetSummary", required = false)
-    protected FreeBetSummaryInit freebetSummary;
+    protected FreeBetSummary freebetSummary;
     @XmlElement(name = "BonusPromotion", required = false)
     protected BonusPromotionInit bonusPromotion;
     @XmlElement(name = "GameConfig", required = false)
@@ -280,7 +280,7 @@ public class Init {
      *     {@link FreeBetSummaryInit }
      *     
      */
-    public FreeBetSummaryInit getFreebetSummary() {
+    public FreeBetSummary getFreebetSummary() {
         return freebetSummary;
     }
 
@@ -292,7 +292,7 @@ public class Init {
      *     {@link FreeBetSummaryInit }
      *     
      */
-    public void setFreebetSummary(FreeBetSummaryInit value) {
+    public void setFreebetSummary(FreeBetSummary value) {
         this.freebetSummary = value;
     }
 

@@ -58,7 +58,7 @@ public class BetState {
     @XmlElement(name = "Bet")
     protected List<Bet> bet;
     @XmlAttribute(name = "drawn")
-    protected Byte drawn;
+    protected int drawn;
     @XmlAttribute(name = "total_bets")
     protected Byte totalBets;
     @XmlAttribute(name = "num_bets")
@@ -101,7 +101,7 @@ public class BetState {
      *     {@link Byte }
      *     
      */
-    public Byte getDrawn() {
+    public int getDrawn() {
         return drawn;
     }
 
@@ -113,7 +113,7 @@ public class BetState {
      *     {@link Byte }
      *     
      */
-    public void setDrawn(Byte value) {
+    public void setDrawn(int value) {
         this.drawn = value;
     }
 

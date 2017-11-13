@@ -51,8 +51,18 @@ public class Bet {
     protected Float winnings;
     @XmlAttribute(name = "seln")
     protected String seln;
+    
+    public Bet() {
+		
+	}
 
-    /**
+	public Bet(String name, Float stake, String seln) {
+		this.name = name;
+		this.stake = stake;
+		this.seln = seln;
+	}
+
+	/**
      * Gets the value of the value property.
      * 
      * @return

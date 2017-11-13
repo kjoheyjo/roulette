@@ -43,13 +43,23 @@ public class GameId {
     @XmlValue
     protected String value;
     @XmlAttribute(name = "id")
-    protected Short id;
+    protected int id;
     @XmlAttribute(name = "ver")
     protected Byte ver;
     @XmlAttribute(name = "channel")
     protected String channel;
+    
+	public GameId() {
+		
+	}
 
-    /**
+	public GameId(int id,Byte ver,String channel) {
+		this.id = id;
+		this.ver = ver;
+		this.channel = channel;
+	}
+	
+	/**
      * Gets the value of the value property.
      * 
      * @return
@@ -81,7 +91,7 @@ public class GameId {
      *     {@link Short }
      *     
      */
-    public Short getId() {
+    public int getId() {
         return id;
     }
 
@@ -93,7 +103,7 @@ public class GameId {
      *     {@link Short }
      *     
      */
-    public void setId(Short value) {
+    public void setId(int value) {
         this.id = value;
     }
 

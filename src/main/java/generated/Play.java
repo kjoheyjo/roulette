@@ -101,6 +101,8 @@ public class Play {
     protected Float stake;
     @XmlAttribute(name = "win")
     protected Float win;
+    @XmlAttribute(name = "freebets")
+    protected String freebets;
     @XmlAttribute(name = "id")
     protected Short id;
 
@@ -247,5 +249,13 @@ public class Play {
     public void setId(Short value) {
         this.id = value;
     }
+
+	public String getFreebets() {
+		return freebets;
+	}
+
+	public void setFreebets(String freebets) {
+		this.freebets = freebets;
+	}
 
 }

@@ -46,7 +46,7 @@ public class Account {
     @XmlValue
     protected String value;
     @XmlAttribute(name = "balance")
-    protected Float balance;
+    protected double balance;
     @XmlAttribute(name = "held_funds")
     protected Float heldFunds;
     @XmlAttribute(name = "ccy_code")
@@ -90,7 +90,7 @@ public class Account {
      *     {@link Float }
      *     
      */
-    public Float getBalance() {
+    public double getBalance() {
         return balance;
     }
 
@@ -102,7 +102,7 @@ public class Account {
      *     {@link Float }
      *     
      */
-    public void setBalance(Float value) {
+    public void setBalance(double value) {
         this.balance = value;
     }
 
