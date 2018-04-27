@@ -23,17 +23,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import com.gt.logic.GameLogic;
 import com.gt.request.GameRequest;
 import com.gt.hibernate.GtBets;
-import com.gt.hibernate.GtGameAccount;
 import com.gt.hibernate.GtGameConfig;
+import com.gt.hibernate.GtSpins;
 import com.gt.services.GtBetsServiceImpl;
-import com.gt.services.GtGameAccountServiceImpl;
 import com.gt.services.GtGameConfigServiceImpl;
 import com.gt.beans.ExceptionManagement;
 import com.gt.beans.ExceptionMessage;
 import com.gt.beans.GameObject;
 import com.gt.beans.RouletteEngine;
-import com.gt.beans.UrlCall;
-import com.gt.services.WebServiceCalling;
 
 import generated.Account;
 import generated.Bet;
@@ -45,6 +42,7 @@ import generated.BetState;
 import generated.BonusPromotion;
 import generated.BonusPromotionInit;
 import generated.Close;
+import generated.Config;
 import generated.Customer;
 import generated.FreeBetSummary;
 import generated.GameConfig;
@@ -66,16 +64,9 @@ public class RouletteController {
 
 	private static final Logger LOGGER = Logger.getLogger(RouletteController.class);
 	private GtBetsServiceImpl gtBetsServiceImpl;
-	private GtGameAccountServiceImpl gtGameAccountServiceImpl;
 	private GtGameConfigServiceImpl gtGameConfigServiceImpl;
-	private WebServiceCalling webServiceCalling;
 	private RouletteEngine rouletteEngine;
-	//private final static String API_BASE_URL = "http://192.168.0.51:8090/gt_games_platform/";//"http://35.154.245.194/";
-	@Autowired
-	public void setWebServiceCalling(WebServiceCalling webServiceCalling) {
-		this.webServiceCalling = webServiceCalling;
-	}
-
+	
 	@Autowired(required=false)
 	public void setGtGameConfigServiceImpl(GtGameConfigServiceImpl gtGameConfigServiceImpl) {
 		this.gtGameConfigServiceImpl = gtGameConfigServiceImpl;
@@ -87,15 +78,21 @@ public class RouletteController {
 	}
 
 	@Autowired(required=false)
-	public void setGtGameAccountServiceImpl(GtGameAccountServiceImpl gtGameAccountServiceImpl) {
-		this.gtGameAccountServiceImpl = gtGameAccountServiceImpl;
-	}
-
-	@Autowired(required=false)
 	public void setRouletteEngine(RouletteEngine rouletteEngine) {
 		this.rouletteEngine = rouletteEngine;
 	}
-
+	
+	/**
+	 * This method handles all 'Init' API calls to the roulette game server. Init API calls can be made from any client by suffixing
+	 * '/init' after the game server's base URL. It returns all the initial configuration required for loading game play area in an XML response body
+	 * represented by the class {@link GameResponse}.
+	 * This method can handle init requests for both versions of roulette supported i.e regular roulette and time based roulette.
+	 * In case of time based roulette the response will contain the time for the next scheduled spin in addition to all the 
+	 * common configuration required.
+	 * @param gameRequest
+	 * @param req
+	 * @return GameResponse
+	 */
 	@CrossOrigin()
 	@RequestMapping(value= "/init",method = RequestMethod.POST, consumes= "application/xml")
 	public @ResponseBody GameResponse testInit( @RequestBody(required = true) GameRequest gameRequest,HttpServletRequest req) {
@@ -106,13 +103,19 @@ public class RouletteController {
 
 			GameObject gameObj = rouletteEngine.init(gameRequest);
 			GameResponse gameResponse = new GameResponse();
-
+			
 			buildHeader(gameResponse,gameRequest.getHeader());	
 			buildInit(gameResponse);					
 			buildStats(gameResponse,gameObj);		
 			FreeBetSummary freeBetSummary = new FreeBetSummary(gameObj.getDummyBalance(),1);
 			gameResponse.getInit().setFreebetSummary(freeBetSummary);
 			gameResponse.getHeader().getCustomer().getAccount().setBalance(gameObj.getRealBalance());
+			
+			// set spinTime and spinId
+			if(gameObj.getSpinTime() != null) {
+				gameResponse.getHeader().getGameId().setSpinId(gameObj.getSpinId());
+				gameResponse.getHeader().getGameId().setSpinTime(gameObj.getSpinTime().toString());
+			}
 
 			if(gameObj.getResultInfo()!=null) {
 				// append spin response
@@ -144,6 +147,10 @@ public class RouletteController {
 	@RequestMapping(value= "/spin",method = RequestMethod.POST, consumes= "application/xml")
 	public @ResponseBody GameResponse testSpin(  @RequestBody(required = true) GameRequest gameRequest) {
 		LOGGER.info("spin call");
+		if(gameRequest.getHeader().getGameId().getTimeRoulette() != null &&
+				gameRequest.getHeader().getGameId().getTimeRoulette().equals("Yes")) {
+			return spinResult(gameRequest);
+		}
 		try {
 			GameObject gameObj = rouletteEngine.spin(gameRequest);
 
@@ -160,7 +167,64 @@ public class RouletteController {
 		}
 
 	}
+	
+	
+	@CrossOrigin
+	@RequestMapping(value="/freeze",method=RequestMethod.POST, consumes="application/xml")
+	public @ResponseBody GameResponse freezeBets(@RequestBody(required=true) GameRequest gameRequest) {
+		GameObject gameObj = rouletteEngine.freezeBets(gameRequest);
+		if(gameObj != null) {
+			GameResponse gameResponse = new GameResponse();
+			Header header = new Header();
+			GameId gameId = new GameId(303,gameRequest.getHeader().getGameId().getVer(),
+					gameRequest.getHeader().getGameId().getChannel());
+			gameId.setSpinId(gameObj.getSpinId());
+			header.setGameId(gameId);
+			gameResponse.setHeader(header);
+			return gameResponse;
+		}else {
+			return null;
+		}
+	}
+	
+	
+	
+	@CrossOrigin
+	@RequestMapping(value="/spinResult",method=RequestMethod.POST, consumes="application/xml")
+	public @ResponseBody GameResponse spinResult(@RequestBody(required=true) GameRequest gameRequest) {
+		
+		GameObject gameObj = rouletteEngine.getSpinResult(gameRequest);
+		GameResponse gameResponse = new GameResponse();
+		buildHeader(gameResponse,gameRequest.getHeader());	
+		FreeBetSummary freeBetSummary = new FreeBetSummary(gameObj.getDummyBalance(),1);
+		//gameResponse.getInit().setFreebetSummary(freeBetSummary);
+		gameResponse.getHeader().getCustomer().getAccount().setBalance(gameObj.getRealBalance());
+		
+		// set spinTime and spinId
+		if(gameObj.getSpinId() != 0) {
+			gameResponse.getHeader().getGameId().setSpinId(gameObj.getSpinId());
+		}
+		
+		if(gameObj.getResultInfo()!=null) {
+			// append spin response
+			Play play = new Play();
+			play.setStake(gameObj.getResultInfo().getStake());
+			play.setWin(gameObj.getResultInfo().getWinnings());
+			play.setBetState(gameObj.getBetState());
 
+			BonusPromotion bonusPromotion = new BonusPromotion();
+			bonusPromotion.setBonusName("BonusBar");
+			bonusPromotion.setBonusType("BBAR");
+			bonusPromotion.setEarnedPcnt(0.00f);
+			bonusPromotion.setAwardTarget((byte) 100);
+			bonusPromotion.setPointsEarned((byte) 0);
+			play.setBonusPromotion(bonusPromotion);
+
+			gameResponse.setPlay(play);
+		}
+		return gameResponse;
+	}
+	
 	@CrossOrigin()
 	@RequestMapping(value= "/close",method = RequestMethod.POST, consumes= "application/xml")
 	public @ResponseBody GameResponse testClose(  @RequestBody(required = true) GameRequest gameRequest) {
@@ -181,6 +245,21 @@ public class RouletteController {
 			gameResponse.getHeader().getCustomer().getAccount().setBalance(gameObj.getRealBalance());
 		}
 		return gameResponse;
+	}
+	
+	@CrossOrigin()
+	@RequestMapping(value= "/config",method = RequestMethod.POST, consumes= "application/xml")
+	public @ResponseBody GameResponse getConfig(  @RequestBody(required = false) GameRequest gameRequest) {
+		LOGGER.info("config call");
+		GtSpins spin = rouletteEngine.findNextSpin();
+		GameResponse gameResponse = new GameResponse();
+		if(spin != null) {
+			long spinTimer = spin.getSpinTime().getTime() - System.currentTimeMillis() ;
+			Config config = new Config(spin.getId(),spinTimer);
+			gameResponse.setConfig(config);
+			return gameResponse;
+		}
+		return null;
 	}
 	
 	@CrossOrigin
@@ -349,7 +428,6 @@ public class RouletteController {
 		Header header = new Header();
 
 		Header responseHeader = new Header();		// create reponse header
-		//<GameId id='303' ver='1' channel='I' />
 		GameId gameId= new GameId();
 		gameId.setId(303);
 		gameId.setChannel("I");
@@ -446,22 +524,6 @@ public class RouletteController {
 
 	*/}
 
-	@RequestMapping(value = "/data", method = RequestMethod.POST, consumes = "application/xml")
-	public @ResponseBody GameResponse getData(@RequestBody(required = true) Header header) {
-		System.out.println("data test");
-
-		List<GtBets> bets = gtBetsServiceImpl.findAllBets();
-		GtGameConfig configs = gtGameConfigServiceImpl.findByGameConfigId(1);
-		gtGameAccountServiceImpl.saveGameAccount(new GtGameAccount(1, 10, 1,new Timestamp(0),new Timestamp(1)));
-
-		for(GtBets bet : bets) {
-			System.out.println(bet.toString());
-		}
-		System.out.println(configs.toString());
-		GameResponse game = new GameResponse();
-		return game;
-	}
-
 	private void printRequestInfo(HttpServletRequest req) {
 
 		StringBuffer requestURL = req.getRequestURL();
@@ -489,7 +551,7 @@ public class RouletteController {
 		}
 	}
 
-	@CrossOrigin()
+/*	@CrossOrigin()
 	@RequestMapping(value= "/testInit",method = RequestMethod.POST, consumes= "application/xml")
 	public @ResponseBody GameResponse getInit( @RequestBody(required = true) GameRequest gameRequest,HttpServletRequest req) {
 		System.out.println("init call");
@@ -502,7 +564,7 @@ public class RouletteController {
 		buildStats(gr,new GameObject(11, 123));
 
 		return gr;
-	}
+	}*/
 	
 	/*
 	@CrossOrigin()

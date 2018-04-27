@@ -11,7 +11,6 @@ import com.gt.dao.GtGameConfigDao;
 import com.gt.hibernate.GtGameConfig;
 
 @Service
-@Transactional
 public class GtGameConfigServiceImpl implements GtGameConfigService {
 	
 	private GtGameConfigDao dao;

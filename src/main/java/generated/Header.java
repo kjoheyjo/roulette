@@ -73,7 +73,7 @@ import com.gt.request.GameDetails;
 @XmlType(name = "", propOrder = {
 	"gameDetails",	
     "gameId",
-    "customer"
+    "customer",
 })
 public class Header {
 

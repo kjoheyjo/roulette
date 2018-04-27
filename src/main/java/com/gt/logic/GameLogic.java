@@ -10,6 +10,14 @@ import generated.BetState;
 
 public class GameLogic {
 	
+	/**
+	 * returns a random number between lower and upper, both inclusive.
+	 * @param numToDraw
+	 * @param isBiased
+	 * @param lower
+	 * @param upper
+	 * @return
+	 */
 	public byte spin(byte numToDraw,boolean isBiased,byte lower,byte upper) {
 		if(upper < lower) {
 			return -1;

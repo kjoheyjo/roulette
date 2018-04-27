@@ -8,6 +8,8 @@
 
 package generated;
 
+import java.sql.Timestamp;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -39,7 +41,7 @@ import javax.xml.bind.annotation.XmlValue;
     "value"
 })
 public class GameId {
-
+	
     @XmlValue
     protected String value;
     @XmlAttribute(name = "id")
@@ -48,6 +50,12 @@ public class GameId {
     protected Byte ver;
     @XmlAttribute(name = "channel")
     protected String channel;
+    @XmlAttribute(name="spin_id")
+    private long spinId;
+    @XmlAttribute(name="spin_time")
+    private String spinTime;
+    @XmlAttribute(name="time_roulette")
+    private String timeRoulette = "Yes";
     
 	public GameId() {
 		
@@ -59,6 +67,30 @@ public class GameId {
 		this.channel = channel;
 	}
 	
+	public String getTimeRoulette() {
+		return timeRoulette;
+	}
+
+	public void setTimeRoulette(String timeRoulette) {
+		this.timeRoulette = timeRoulette;
+	}
+
+	public long getSpinId() {
+		return spinId;
+	}
+
+	public void setSpinId(long spinId) {
+		this.spinId = spinId;
+	}
+
+	public String getSpinTime() {
+		return spinTime;
+	}
+
+	public void setSpinTime(String spinTime) {
+		this.spinTime = spinTime;
+	}
+
 	/**
      * Gets the value of the value property.
      * 

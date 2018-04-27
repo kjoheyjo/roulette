@@ -18,6 +18,8 @@ public class GtGameAccount {
 	private int id;
 	@Column(name="player_id")
 	private int playerId;
+	@Column(name="spin_id")
+	private long spinId;
 	@Column(name="state")
 	private int state;		// 0 -> init, 1 -> spin, 2 -> close
 	@Column(name="bet_amount")
@@ -31,6 +33,14 @@ public class GtGameAccount {
 	@Column(name="created_date")
 	private Timestamp createdDate;
 	
+	public long getSpinId() {
+		return spinId;
+	}
+
+	public void setSpinId(long spinId) {
+		this.spinId = spinId;
+	}
+
 	public GtGameAccount(int id, int playerId, int state, Timestamp modifiedDate, Timestamp createdDate) {
 		super();
 		this.id = id;

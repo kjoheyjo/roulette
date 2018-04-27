@@ -20,7 +20,21 @@ public class GameDetails {
 	    @XmlAttribute(name = "channel")
 	    private String channel;
 	    @XmlAttribute(name = "free_play")
-	    private String freePLay;
+	    private String freePlay;
+	    @XmlAttribute(name="time_roulette")
+	    private String timeRoulette = "Yes";
+		public String getFreePlay() {
+			return freePlay;
+		}
+		public void setFreePlay(String freePlay) {
+			this.freePlay = freePlay;
+		}
+		public String getTimeRoulette() {
+			return timeRoulette;
+		}
+		public void setTimeRoulette(String timeRoulette) {
+			this.timeRoulette = timeRoulette;
+		}
 		public String getValue() {
 			return value;
 		}
@@ -46,10 +60,10 @@ public class GameDetails {
 			this.channel = channel;
 		}
 		public String getFreePLay() {
-			return freePLay;
+			return freePlay;
 		}
 		public void setFreePLay(String freePLay) {
-			this.freePLay = freePLay;
+			this.freePlay = freePLay;
 		}
 	    
 	    

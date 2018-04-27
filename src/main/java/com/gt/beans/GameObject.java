@@ -1,5 +1,6 @@
 package com.gt.beans;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public class GameObject {
 	private double dummyBalance;
 	private BetState betState;
 	private ResultInfo resultInfo;
+	private Timestamp spinTime;
+	private long spinId;
 	private List<Integer> lastDraws = new ArrayList<Integer>();
 	
 	public GameObject(int gameId, int userId) {
@@ -27,6 +30,9 @@ public class GameObject {
 		this.gameId = gameId;
 		this.userId = userId;
 		this.realBalance = realBalance;
+	}
+	public GameObject() {
+		
 	}
 	public int getGameId() {
 		return gameId;
@@ -69,6 +75,18 @@ public class GameObject {
 	}
 	public void setLastDraws(List<Integer> lastDraws) {
 		this.lastDraws = lastDraws;
+	}
+	public Timestamp getSpinTime() {
+		return spinTime;
+	}
+	public void setSpinTime(Timestamp spinTime) {
+		this.spinTime = spinTime;
+	}
+	public long getSpinId() {
+		return spinId;
+	}
+	public void setSpinId(long spinId) {
+		this.spinId = spinId;
 	}
 	
 }

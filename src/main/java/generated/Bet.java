@@ -41,7 +41,13 @@ import javax.xml.bind.annotation.XmlValue;
 })
 public class Bet {
 
-    @XmlValue
+    @Override
+	public String toString() {
+		return "Bet [value=" + value + ", name=" + name + ", stake=" + stake + ", winnings=" + winnings + ", seln="
+				+ seln + "]";
+	}
+
+	@XmlValue
     protected String value;
     @XmlAttribute(name = "name")
     protected String name;

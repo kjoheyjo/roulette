@@ -64,7 +64,12 @@ public class BetState {
     @XmlAttribute(name = "num_bets")
     protected Byte numBets;
 
-    /**
+    @Override
+	public String toString() {
+		return "BetState [bet=" + bet + ", drawn=" + drawn + ", totalBets=" + totalBets + ", numBets=" + numBets + "]";
+	}
+
+	/**
      * Gets the value of the bet property.
      * 
      * <p>

@@ -1,11 +1,10 @@
 package com.gt.services;
 
-import java.util.Date;
-
 import com.gt.hibernate.GtSpins;
 
 public interface GtSpinsService {
-	void createSpinSchedule(Date spinTime);
+	void saveSpinSchedule(GtSpins gtSpin);
 	void updateSpinSchedule(GtSpins gtSpin);
 	GtSpins findSpinById(long id);
+	GtSpins findNextSpin();
 }

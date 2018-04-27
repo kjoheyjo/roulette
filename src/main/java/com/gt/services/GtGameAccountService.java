@@ -12,5 +12,6 @@ public interface GtGameAccountService {
     void updateGameAccount(GtGameAccount gtGameAccount);
     GtGameAccount findActiveGameByPlayerId(int playerId);
 	List<GtGameAccount> findRecentGames();
+	GtGameAccount findActiveSpinGameByPlayerId(int playerId);
 
 }

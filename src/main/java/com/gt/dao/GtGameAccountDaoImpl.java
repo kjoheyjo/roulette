@@ -20,14 +20,17 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 
 	public List<GtGameAccount> findByProperty(String propertyName, Object value) {
 		session = getSession();
+		System.out.println("game account find dao for player id " + value + " session - " + session.toString());
 		try {
 			tx = session.beginTransaction();
 			String queryString = "from GtGameAccount as model where model." + propertyName + "= ? and model.state=1";
 			Query queryObject = session.createQuery(queryString);
 			queryObject.setParameter(0, value);
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 			return queryObject.list();
-		} catch (RuntimeException re) {
+		} catch (Exception re) {
 			tx.rollback();
 			throw re;
 		}
@@ -39,7 +42,9 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 		try {
 			tx = session.beginTransaction();
 			session.persist(gtGameAccount);
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
@@ -54,7 +59,9 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 		try {
 			tx = session.beginTransaction();
 			criteria = session.createCriteria(GtGameAccount.class);
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
@@ -70,7 +77,9 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 			tx = session.beginTransaction();
 			criteria = session.createCriteria(GtGameAccount.class);
 			criteria.add(Restrictions.eq("gameId",gameId));
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
@@ -84,7 +93,9 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 		try {
 			tx = session.beginTransaction();
 			session.update(gtGameAccount);
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 		} catch (Exception e) {
 			tx.commit();
 			e.printStackTrace();
@@ -93,11 +104,26 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 
 	@Override
 	public GtGameAccount findActiveGameByPlayerId(int playerId) {
-		List<GtGameAccount> gameAccounts = findByProperty("playerId", playerId);
-		if(gameAccounts.isEmpty()) {
-			return null;
+		System.out.println("game account DAO for player id " + playerId);
+		session = getSession();
+		Criteria criteria = null;
+		try {
+			tx = session.beginTransaction();
+			criteria = session.createCriteria(GtGameAccount.class);
+			criteria.add(Restrictions.eq("playerId", playerId));
+			criteria.add(Restrictions.eq("state", 1));
+			criteria.add(Restrictions.eq("spinId", 0L));
+			criteria.addOrder(Order.desc("id"));
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
+			return (GtGameAccount) criteria.uniqueResult();
+		} catch (RuntimeException re) {
+			tx.rollback();
+			throw re;
 		}
-		return gameAccounts.get(0);
+	
+	
 	}
 
 	@Override
@@ -109,11 +135,36 @@ public class GtGameAccountDaoImpl extends BaseHibernateDAO implements GtGameAcco
 			Criteria criteria = session.createCriteria(GtGameAccount.class);
 			criteria.addOrder(Order.desc("id"));
 			criteria.setMaxResults(5);
-			tx.commit();
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
 			return criteria.list();
 		} catch (RuntimeException re) {
 			tx.rollback();
 			throw re;
 		}
+	}
+
+	@Override
+	public GtGameAccount findActiveSpinGameByPlayerId(int playerId) {
+		session = getSession();
+		Criteria criteria = null;
+		try {
+			tx = session.beginTransaction();
+			criteria = session.createCriteria(GtGameAccount.class);
+			criteria.add(Restrictions.eq("playerId", playerId));
+			criteria.add(Restrictions.eq("state", 1));
+			criteria.add(Restrictions.ne("spinId", 0L));
+			criteria.addOrder(Order.desc("id"));
+			criteria.setMaxResults(1);
+			if(!tx.wasCommitted()) {
+				tx.commit();
+			}
+			return (GtGameAccount) criteria.uniqueResult();
+		} catch (RuntimeException re) {
+			tx.rollback();
+			throw re;
+		}
+	
 	}
 }

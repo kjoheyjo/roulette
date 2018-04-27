@@ -1,6 +1,6 @@
 package com.gt.hibernate;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +17,7 @@ public class GtSpins {
 	@Column(name="id")
 	private long id;
 	@Column(name="spin_time")
-	private Date spinTime;
+	private Timestamp spinTime;
 	@Column(name="draw")
 	private int draw;
 	@Column(name="status")
@@ -25,13 +25,13 @@ public class GtSpins {
 	public GtSpins() {
 		
 	}
-	public GtSpins(long id, Date spinTime, int draw, int status) {
+	public GtSpins(long id, Timestamp spinTime, int draw, int status) {
 		this.id = id;
 		this.spinTime = spinTime;
 		this.draw = draw;
 		this.status = status;
 	}
-	public GtSpins(Date spinTime, int draw, int status) {
+	public GtSpins(Timestamp spinTime, int draw, int status) {
 		this.spinTime = spinTime;
 		this.draw = draw;
 		this.status = status;
@@ -42,10 +42,10 @@ public class GtSpins {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public Date getSpinTime() {
+	public Timestamp getSpinTime() {
 		return spinTime;
 	}
-	public void setSpinTime(Date spinTime) {
+	public void setSpinTime(Timestamp spinTime) {
 		this.spinTime = spinTime;
 	}
 	public int getDraw() {

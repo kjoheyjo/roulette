@@ -312,23 +312,34 @@ import javax.xml.bind.annotation.XmlType;
     "init",
     "play",
     "stats",
-    "close"
+    "close",
+    "config"
 })
 @XmlRootElement(name = "GameResponse")
 public class GameResponse {
 
-    @XmlElement(name = "Header", required = true)
+    @XmlElement(name = "Header", required = false)
     protected Header header;
-    @XmlElement(name = "Init", required = true)
+    @XmlElement(name = "Init", required = false)
     protected Init init;
-    @XmlElement(name = "Play", required = true)
+    @XmlElement(name = "Play", required = false)
     protected Play play;
-    @XmlElement(name = "Stats", required = true)
+    @XmlElement(name = "Stats", required = false)
     protected Stats stats;
-    @XmlElement(name = "Close", required = true)
+    @XmlElement(name = "Close", required = false)
     protected Close close;
+    @XmlElement(name = "Config", required = false)
+    protected Config config;
 
-    /**
+    public Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(Config config) {
+		this.config = config;
+	}
+
+	/**
      * Gets the value of the header property.
      * 
      * @return

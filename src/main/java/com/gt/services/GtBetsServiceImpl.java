@@ -12,7 +12,6 @@ import com.gt.dao.GtBetsDaoImpl;
 import com.gt.hibernate.GtBets;
 
 @Service
-@Transactional
 public class GtBetsServiceImpl implements GtBetsService {
 	
 	private GtBetsDao dao;

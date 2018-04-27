@@ -17,11 +17,9 @@ import org.springframework.context.annotation.PropertySource;
   */
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import com.gt.beans.Config;
 @Configuration
 @PropertySource("classpath:application-test.properties")
-@ComponentScan(basePackages = "com.gt")
+@ComponentScan(basePackages = {"com.gt","com.schedules"})
 @EnableScheduling
 public class AppConfig {
 	
@@ -31,21 +29,29 @@ public class AppConfig {
 	@Bean(name="config")
 	@Profile("local")
 	public Config local() {
+		System.out.println("========= local server ========");
+		System.out.println("Operator API - " + env.getProperty("api.testUrl"));
 		return new Config(env.getProperty("api.testUrl"));
 	}
 	@Bean(name="config")
 	@Profile("qa")
 	public Config test() {
+		System.out.println("========= test server ========");
+		System.out.println("Operator API - " + env.getProperty("api.testUrl"));
 		return new Config(env.getProperty("api.testUrl"));
 	}
 	@Bean(name="config")
 	@Profile("staging")
 	public Config staging() {
+		System.out.println("========= staging server ========");
+		System.out.println("Operator API - " + env.getProperty("api.stagingUrl"));
 		return new Config(env.getProperty("api.stagingUrl"));
 	}
 	@Bean(name="config")
 	@Profile("prod")
 	public Config prod() {
+		System.out.println("========= production server ========");
+		System.out.println("Operator API - " + env.getProperty("api.prodUrl"));
 		return new Config(env.getProperty("api.prodUrl"));
 	}
 	

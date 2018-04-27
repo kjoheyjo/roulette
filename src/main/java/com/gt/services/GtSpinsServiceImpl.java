@@ -1,12 +1,12 @@
 package com.gt.services;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.gt.dao.GtSpinsDao;
 import com.gt.hibernate.GtSpins;
 
+@Service
 public class GtSpinsServiceImpl implements GtSpinsService{
 
 	private GtSpinsDao dao;
@@ -20,8 +20,8 @@ public class GtSpinsServiceImpl implements GtSpinsService{
 		this.dao = dao;
 	}
 	@Override
-	public void createSpinSchedule(Date spinTime) {
-		dao.createSpinSchedule(spinTime);
+	public void saveSpinSchedule(GtSpins gtSpin) {
+		dao.saveSpinSchedule(gtSpin);
 	}
 
 	@Override
@@ -32,6 +32,11 @@ public class GtSpinsServiceImpl implements GtSpinsService{
 	@Override
 	public GtSpins findSpinById(long id) {
 		return dao.findSpinById(id);
+	}
+	
+	@Override
+	public GtSpins findNextSpin() {
+		return dao.findNextSpin();
 	}
 
 }

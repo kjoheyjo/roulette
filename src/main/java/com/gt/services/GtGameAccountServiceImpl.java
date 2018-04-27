@@ -11,7 +11,6 @@ import com.gt.dao.GtGameAccountDao;
 import com.gt.hibernate.GtGameAccount;
 
 @Service
-@Transactional
 public class GtGameAccountServiceImpl implements GtGameAccountService {
 	
 	private GtGameAccountDao dao;
@@ -43,6 +42,7 @@ public class GtGameAccountServiceImpl implements GtGameAccountService {
 
 	@Override
 	public GtGameAccount findActiveGameByPlayerId(int playerId) {
+		System.out.println("game account service for player id " + playerId);
 		return dao.findActiveGameByPlayerId(playerId);
 	}
 	
@@ -50,6 +50,11 @@ public class GtGameAccountServiceImpl implements GtGameAccountService {
 	public List<GtGameAccount> findRecentGames() {
 		// TODO Auto-generated method stub
 		return dao.findRecentGames();
+	}
+	
+	@Override
+	public GtGameAccount findActiveSpinGameByPlayerId(int playerId) {
+		return dao.findActiveSpinGameByPlayerId(playerId);
 	}
 
 }
